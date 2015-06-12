@@ -15,5 +15,14 @@
     "mongoose": "^4.0.5",
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^3.1.5",
+    "chai": "^2.3.0",
+    "gulp": "^3.8.11",
+    "gulp-livereload": "~1.1.1",
+    "gulp-watch": "~0.5.0",
+    "nodemon": "*",
+    "supertest": "^0.15.0"
   }
 }
