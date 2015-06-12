@@ -1,12 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var Chirpy = require('../models/');
-
+var status = require('../config/status');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', {
-    title: 'Express'
+
+  Chirpy.find({}, function(err, chirpies) {
+    res.render('index', {
+      title: 'Express',
+      chirpies: chirpies
+    });
   });
 });
 
@@ -17,7 +21,8 @@ router.post('/chirpies', function(req, res, next) {
 
   chirpy.save(function() {
     res.json({
-      status: 'success'
+      status: status.FULL,
+      id: chirpy.id,
     });
   });
 
@@ -55,8 +60,12 @@ router.post('/chirpies/:id/feed', function(req, res, next) {
       Chirpy.update({
         _id: id
       }, {
-        satistification: satistification
-      }).exec(function(err, chirpy) {
+        $inc: {
+          satistification: random
+        }
+      }, {
+        runValidators: true
+      }, function(err, chirpy) {
         res.json({
           chirpy: chirpy,
           status: 'succeed'
@@ -69,12 +78,30 @@ router.post('/chirpies/:id/feed', function(req, res, next) {
 });
 
 router.post('/chirpies/:id/walk', function(req, res, next) {
+  var steps = req.body.steps;
+  var id = req.params.id;
+  var vitamin = steps / 5;
+
   Chirpy.find({
-      _id: req.params.id
+      _id: id
     },
-    function(err, chirpy) {
-      chirpy.walk();
-      res.json(chirpy);
+    function(err, chirpies) {
+      var chirpy = chirpies[0];
+
+      Chirpy.update({
+        _id: id
+      }, {
+        $inc: {
+          vitamin: vitamin
+        }
+      }, {
+        runValidators: true
+      }, function(err, chirpy) {
+        res.json({
+          chirpy: chirpy,
+          status: 'succeed'
+        });
+      });
     }
   );
 });

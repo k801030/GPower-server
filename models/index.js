@@ -30,14 +30,6 @@ var chirpy = new Schema({
   },
 });
 
-chirpy.methods.feed = function() {
-  this.vitamin -= 20;
-  this.satistification += parseInt(Math.random() * 3 + 1);
-};
-chirpy.methods.walk = function(step) {
-  this.vitamin += step / 5;
-};
-
 var Chirpy = mongoose.model('Chirpy', chirpy);
 
 module.exports = Chirpy;

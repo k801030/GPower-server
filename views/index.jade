@@ -3,3 +3,11 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  
+
+  each chirpy in chirpies
+    p= chirpy.id
+    p= chirpy.name
+    p= chirpy.satistification
+    p= chirpy.vitamin
+    p= chirpy.step
