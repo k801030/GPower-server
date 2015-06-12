@@ -12,10 +12,8 @@ router.get('/', function(req, res, next) {
 
 
 // create
-router.post('/chirpy', function(req, res, next) {
-  var chirpy = new Chirpy({
-    name: req.body.name
-  });
+router.post('/chirpies', function(req, res, next) {
+  var chirpy = new Chirpy(req.body);
 
   chirpy.save(function() {
     res.json({
@@ -26,14 +24,13 @@ router.post('/chirpy', function(req, res, next) {
 });
 
 router.get('/chirpies', function(req, res, next) {
-  Chirpy.find({},
-    function(err, chirpies) {
-      res.json(chirpies);
-    });
+  Chirpy.find({}, function(err, chirpies) {
+    res.json(chirpies);
+  });
 });
 
 
-router.get('/chirpy/:id', function(req, res, next) {
+router.get('/chirpies/:id', function(req, res, next) {
   console.log(req.params.id);
   Chirpy.find({
       _id: req.params.id
@@ -44,18 +41,34 @@ router.get('/chirpy/:id', function(req, res, next) {
 });
 
 
-router.post('/chirpy/:id/feed', function(req, res, next) {
+router.post('/chirpies/:id/feed', function(req, res, next) {
+
+  var id = req.params.id;
   Chirpy.find({
-      _id: req.params.id
+      _id: id
     },
-    function(err, chirpy) {
-      chirpy.feed();
-      res.josn(chirpy);
+    function(err, chirpies) {
+      var chirpy = chirpies[0];
+      var random = parseInt(Math.random() * 3) + 1;
+      var satistification = parseInt(chirpy.satistification) + random;
+
+      Chirpy.update({
+        _id: id
+      }, {
+        satistification: satistification
+      }).exec(function(err, chirpy) {
+        res.json({
+          chirpy: chirpy,
+          status: 'succeed'
+        });
+      });
     }
   );
+
+
 });
 
-router.post('/chirpy/:id/walk', function(req, res, next) {
+router.post('/chirpies/:id/walk', function(req, res, next) {
   Chirpy.find({
       _id: req.params.id
     },
