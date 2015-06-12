@@ -7,7 +7,7 @@ var chirpy = new Schema({
     type: Number,
     min: 0,
     max: 10,
-    default: 10
+    default: 10,
   },
   vitamin: {
     type: Number,
@@ -19,6 +19,13 @@ var chirpy = new Schema({
     type: Number,
     default: 0
   },
+
+  feedByOthers: [{
+    id: {
+      type: String
+    }
+  }],
+
   createAt: {
     type: Date,
     default: Date.now

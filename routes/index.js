@@ -15,11 +15,13 @@ router.get('/', function(req, res, next) {
 });
 
 
+
 // create
 router.post('/chirpies', function(req, res, next) {
   var chirpy = new Chirpy(req.body);
 
-  chirpy.save(function() {
+  chirpy.save(function(err, chirpy) {
+
     res.json({
       status: status.FULL,
       id: chirpy.id,
@@ -40,39 +42,50 @@ router.get('/chirpies/:id', function(req, res, next) {
   Chirpy.find({
       _id: req.params.id
     },
-    function(err, chirpy) {
-      res.json(chirpy);
+    function(err, chirpies) {
+      res.json(chirpies[0]);
     });
 });
 
 
 router.post('/chirpies/:id/feed', function(req, res, next) {
+  //var user_id = req.body.user_id;
+  var chirpy_id = req.params.id;
 
-  var id = req.params.id;
+
+
   Chirpy.find({
-      _id: id
-    },
-    function(err, chirpies) {
-      var chirpy = chirpies[0];
-      var random = parseInt(Math.random() * 3) + 1;
-      var satistification = parseInt(chirpy.satistification) + random;
+    _id: chirpy_id
+  }, function(err, chirpies) {
 
-      Chirpy.update({
-        _id: id
-      }, {
-        $inc: {
-          satistification: random
-        }
-      }, {
-        runValidators: true
+    var chirpy = chirpies[0];
+    var random = parseInt(Math.random() * 3) + 1;
+    var satistification = parseInt(chirpy.satistification) + random;
+
+    /*// Feed by other
+    if (user_id !== chirpy_id) {
+
+      Chirpy.findOne({
+        _id: user_id
       }, function(err, chirpy) {
-        res.json({
-          chirpy: chirpy,
-          status: 'succeed'
-        });
+
+        chirpy.vitamin -= 10;
+
       });
-    }
-  );
+
+      chirpy.feedByOthers.push({
+        id: user_id,
+      });
+    }*/
+
+    chirpy.satistification = satistification;
+    chirpy.save(function(err) {
+      if (err) {
+        chirpy.satistification = 10;
+      }
+      chirpy.save();
+    });
+  });
 
 
 });
@@ -88,18 +101,16 @@ router.post('/chirpies/:id/walk', function(req, res, next) {
     function(err, chirpies) {
       var chirpy = chirpies[0];
 
-      Chirpy.update({
-        _id: id
-      }, {
-        $inc: {
-          vitamin: vitamin
+      chirpy.vitamin += vitamin;
+
+      chirpy.save(function(err) {
+        if (err) {
+          chirpy.vitamin = 100;
         }
-      }, {
-        runValidators: true
-      }, function(err, chirpy) {
-        res.json({
-          chirpy: chirpy,
-          status: 'succeed'
+        chirpy.save(function() {
+          res.json({
+            status: 'success'
+          });
         });
       });
     }
